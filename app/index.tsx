@@ -19,14 +19,19 @@ export default function Index() {
           
           screenPadding: 0,
         };
+
+        const sleep = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms));
       
 
     async function loadChat() {
         
+        await sleep(1000);
         const client = StreamChat.getInstance(STREAM_KEY, {});
         setChatClient(client);
 
         try {
+            
             const channels = await client.queryChannels(
               { type: STREAM_CHAT_TYPE },
               [],
