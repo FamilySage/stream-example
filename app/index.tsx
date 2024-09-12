@@ -1,3 +1,4 @@
+import { useChannels } from "@/channelsContext";
 import React, { useEffect, useState } from "react";
 import { ActivityIndicator, RefreshControl, View } from "react-native";
 import { SafeAreaView, useSafeAreaInsets } from "react-native-safe-area-context";
@@ -14,6 +15,7 @@ export default function Index() {
     const [chatClient, setChatClient] = useState<StreamChat | undefined>();
     const [channel, setChannel] = useState<ChannelType | undefined>();
     const insets = useSafeAreaInsets();
+    const { channelId, setChannelId } = useChannels();
 
     const streamTheme: DeepPartial<Theme> = {
           
@@ -30,34 +32,46 @@ export default function Index() {
         const client = StreamChat.getInstance(STREAM_KEY, {});
         setChatClient(client);
 
-        try {
+        updateChannel(client);
+    }
+
+    async function updateChannel(client: StreamChat) {
+      try {
             
-            const channels = await client.queryChannels(
-              { type: STREAM_CHAT_TYPE },
-              [],
-              {
-                watch: true,
-                state: true,
-              },
-            );
-            if (channels) {
-                const channel = channels[0];
-                setChannel(channel);
-            } 
-            setLoading(false);
-          } catch (error) {
-            console.error(error);
-          }
+        const channels = await client.queryChannels(
+          { type: "demo", id: { $eq: channelId } },
+          [],
+          {
+            watch: true,
+            state: true,
+          },
+        );
+        if (channels) {
+            const channel = channels[0];
+            setChannel(channel);
+        } else {
+          const channel = client.channel("demo", channelId);
+          await channel.create();
+          setChannel(channel);
+        }
+        setLoading(false);
+      } catch (error) {
+        console.error(error);
+      }
+
     }
 
     useEffect(() => {
         loadChat();
     }, []);
 
+    useEffect(() => {
+      if (chatClient) updateChannel(chatClient!);
+    }, [channelId])
+
     return (
         <View style={{ flex: 1, backgroundColor: "white"}}>
             <SafeAreaView style={{ flex: 1, marginBottom: -1 * insets.bottom }}>
-                <View style={{ height: 100, backgroundColor: "pink"}} />
             {loading && 
                 (<View style={{ flex: 1, alignItems: "center", justifyContent: "center"}}>
                     <View>

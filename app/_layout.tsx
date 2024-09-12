@@ -4,6 +4,7 @@ import { Icon, Provider } from "react-native-paper";
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { OverlayProvider } from "stream-chat-expo";
 import { StreamChat } from "stream-chat";
+import { ChannelsProvider } from "../src/channelsContext";
 
 export let STREAM_KEY = `${process.env.EXPO_PUBLIC_STREAM_KEY}`;
 export let STREAM_CHANNEL = `${process.env.EXPO_PUBLIC_STREAM_CHANNEL}`;
@@ -30,6 +31,7 @@ export default function TabLayout() {
     <Provider>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <OverlayProvider>
+          <ChannelsProvider>
     <Tabs
       screenOptions={{
         headerShown: false,
@@ -47,16 +49,17 @@ export default function TabLayout() {
         }}
       />
       <Tabs.Screen
-        name="tab2"
+        name="select"
         options={{
           tabBarIcon: ({ size, color }: { size: number; color: string }) => (
             <Icon source="numeric-2" size={size} color={color} />
           ),
         }}
       />
+
     </Tabs>
     
-    
+    </ChannelsProvider>
     </OverlayProvider>
     </GestureHandlerRootView>
     </Provider>
